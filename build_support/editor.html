@@ -27,12 +27,23 @@
         alert("Ace Rocks " + items[i]);
     }
 }</pre>
-    
-<script src="src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="../demo/kitchen-sink/require.js"></script>
 <script>
-    var editor = ace.edit("editor");
-    editor.setTheme("ace/theme/twilight");
-    editor.getSession().setMode("ace/mode/javascript");
+    require.config({
+        baseUrl: window.location.protocol + "//" + window.location.host
+                + window.location.pathname.split("/").slice(0, -1).join("/"),
+
+        paths: {
+            ace: "../lib/ace"
+        }
+    });
+
+    require(["ace/ace"], function (ace) {
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/monokai");
+        editor.getSession().setMode("ace/mode/javascript");
+    });
 </script>
 
 </body>
