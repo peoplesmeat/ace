@@ -31,7 +31,7 @@
 <script src="../demo/kitchen-sink/require.js"></script>
 <script>
     require.config({
-        //urlArgs: "bust=" + (new Date()).getTime(),
+        urlArgs: "bust=" + (new Date()).getTime(),
         baseUrl: window.location.protocol + "//" + window.location.host
                 + window.location.pathname.split("/").slice(0, -1).join("/"),
 
@@ -42,6 +42,7 @@
 
     require(["ace/ace"], function (ace) {
         var editor = ace.edit("editor");
+        window.editor = editor;
         editor.setTheme("ace/theme/monokai");
         editor.getSession().setMode("ace/mode/javascript");
         editor.getSession().setUseWorker(false);

@@ -124,6 +124,9 @@ class Cling(object):
                 return self.not_modified(environ, start_response, headers)
             file_like = self._file_like(full_path)
             headers.append(('Content-Type', content_type))
+            headers.append(('Cache-Control','no-cache, no-store, must-revalidate'))
+            headers.append(('Pragma','no-cache'))
+            headers.append(('Expires','0'))
             start_response("200 OK", headers)
             if environ['REQUEST_METHOD'] == 'GET':
                 return self._body(full_path, environ, file_like)
