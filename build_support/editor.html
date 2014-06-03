@@ -109,10 +109,33 @@
         var doc = new document.OnlineDocument(8000000, new WindowLoader());
         doc.setLoadingString("..");
         var editor = ace.edit("editor", doc);
-        editor.setTheme("ace/theme/monokai");
+        editor.setTheme("ace/theme/chrome");
         editor.setLineRenderer(lineRenderer);
         editor.getSession().setMode("ace/mode/javascript");
         editor.getSession().setUseWorker(false);
+        editor.setShowPrintMargin(false);
+
+        editor.getSession().selection.on('changeCursor', function(e) {
+            console.log("changeCursor", e, editor.selection.getCursor());
+        });
+
+        editor.setKeyboardHandler(function(data, hashId, key, keyCode, e) {
+            // ignore command keys (shift, ctrl etc.)
+            if (hashId !== 0 && (!key || keyCode == -1))
+                return null;
+
+            if (keyCode >=33 && keyCode <= 40 ) {
+                return null;
+            }
+
+            var editor = data.editor;
+
+            console.log("keyboard", data, hashId, key, keyCode, e);
+            return {
+                command: "null"
+            };
+        });
+
 
     });
 </script>
