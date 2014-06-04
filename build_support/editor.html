@@ -44,18 +44,49 @@
 
         var WindowLoader = function() {
             this.windowSize = 1000;
-
+            this.lineSizes = [];
             this.load = function(rowNum, callback) {
-                console.log("Loading...",rowNum);
-
+                var duNum = this.rowToDisplayUnit(rowNum);
+                console.log("Loading...",rowNum, duNum);
                 var tlines = [];
-                for (var i=rowNum; i<rowNum + this.windowSize; i++) {
+                for (var i=duNum; i<duNum + this.windowSize; i++) {
 
-                    var line = '<div style="height:14px" class="ace_line"><span class="branchLines"> &nbsp;</span><span class="offset disassembly-cell">.interp:4194872</span><span class="raw disassembly-cell">2f</span><span class="instruction"><span class="string">/</span></span></div>'
-                    var s = {"section_name":".text","offset":4233570,"rawBytes":"4889c7","instStr":"mov    rdi,rax","branch":"&#x2001;&#x2001;&nbsp;","branch_label":"&#x2001;&#x2001;&nbsp;","opcode":"mov","operands":"rdi,rax","stringRef":null,"branchRef":null,"targetRef":null,"crossRef":[],"isBranch":false,"isFunction":false,"labelName":"abc"}
+                    //var line = '<div style="height:14px" class="ace_line"><span class="branchLines"> &nbsp;</span><span class="offset disassembly-cell">.interp:4194872</span><span class="raw disassembly-cell">2f</span><span class="instruction"><span class="string">/</span></span></div>'
+                    var s = {"section_name":".text","offset":4233570,"rawBytes":"4889c7" + "_ row:" + i,"instStr":"mov    rdi,rax","branch":"&#x2001;&#x2001;&nbsp;","branch_label":"&#x2001;&#x2001;&nbsp;","opcode":"mov","operands":"rdi,rax","stringRef":null,"branchRef":null,"targetRef":null,"crossRef":[],"isBranch":false,"isFunction":false,"labelName":"abc"}
                     tlines.push(JSON.stringify(s));
+
+                    if (i%10 == 0) {
+                        var s2 = {"section_name":".text","offset":4233570,"rawBytes":"4889c7" + "_ row2:" + i,"instStr":"mov    rdi,rax","branch":"&#x2001;&#x2001;&nbsp;","branch_label":"&#x2001;&#x2001;&nbsp;","opcode":"mov","operands":"rdi,rax","stringRef":null,"branchRef":null,"targetRef":null,"crossRef":[],"isBranch":false,"isFunction":false,"labelName":"abc"}
+                        tlines.push(JSON.stringify(s2));
+                        this.lineSizes[i] = 2;
+                    }
                 }
                 callback(new document.Window(rowNum, tlines));
+            };
+
+            this.rowToDisplayUnit = function(row) {
+                var total = 0;
+                var i = 0;
+                while (total < row) {
+                    if (this.lineSizes[i]) {
+                        total += this.lineSizes[i];
+                    } else {
+                        total += 1;
+                    }
+                    i += 1
+                }
+
+                return i;
+            };
+
+            this.displayUnitToRow = function(row) {
+                var linesAdded = 0;
+                for (var key in this.lineSizes) {
+                    if (parseInt(key) < row) {
+                        linesAdded += this.lineSizes[key];
+                    }
+                }
+                return row + linesAdded;
             };
 
             this.getWindowSize = function() {
@@ -106,7 +137,7 @@
 
         };
 
-        var doc = new document.OnlineDocument(8000000, new WindowLoader());
+        var doc = new document.OnlineDocument(5000, new WindowLoader());
         doc.setLoadingString("..");
         var editor = ace.edit("editor", doc);
         editor.setTheme("ace/theme/chrome");
