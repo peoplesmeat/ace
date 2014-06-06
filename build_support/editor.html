@@ -49,6 +49,7 @@
                 var duNum = this.rowToDisplayUnit(rowNum);
                 console.log("Loading...",rowNum, duNum);
                 var tlines = [];
+                var additionalLines = 0;
                 for (var i=duNum; i<duNum + this.windowSize; i++) {
 
                     //var line = '<div style="height:14px" class="ace_line"><span class="branchLines"> &nbsp;</span><span class="offset disassembly-cell">.interp:4194872</span><span class="raw disassembly-cell">2f</span><span class="instruction"><span class="string">/</span></span></div>'
@@ -59,9 +60,10 @@
                         var s2 = {"section_name":".text","offset":4233570,"rawBytes":"4889c7" + "_ row2:" + i,"instStr":"mov    rdi,rax","branch":"&#x2001;&#x2001;&nbsp;","branch_label":"&#x2001;&#x2001;&nbsp;","opcode":"mov","operands":"rdi,rax","stringRef":null,"branchRef":null,"targetRef":null,"crossRef":[],"isBranch":false,"isFunction":false,"labelName":"abc"}
                         tlines.push(JSON.stringify(s2));
                         this.lineSizes[i] = 2;
+                        additionalLines += 1;
                     }
                 }
-                callback(new document.Window(rowNum, tlines));
+                callback(new document.Window(rowNum, tlines), additionalLines);
             };
 
             this.rowToDisplayUnit = function(row) {
@@ -137,7 +139,7 @@
 
         };
 
-        var doc = new document.OnlineDocument(5000, new WindowLoader());
+        var doc = new document.OnlineDocument(5000000, new WindowLoader());
         doc.setLoadingString("..");
         var editor = ace.edit("editor", doc);
         editor.setTheme("ace/theme/chrome");
