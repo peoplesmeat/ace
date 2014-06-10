@@ -18,6 +18,9 @@
         right: 0;
     }
   </style>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
 </head>
 <body>
 
@@ -40,6 +43,34 @@
         }
     });
 
+    var renderer = function(du, i) {
+        var stringBuilder = [];
+
+        var lines = [];
+        lines.push('<span class="branchLines">');
+        lines.push(du.branch);
+        lines.push('</span>');
+        lines.push('<span class="offset disassembly-cell">');
+        lines.push(du.section_name + ":" + du.offset + '&nbsp;');
+        lines.push('</span>');
+        lines.push('<span class="raw disassembly-cell">' + du.rawBytes + '&nbsp;&nbsp;&nbsp;&nbsp;</span>');
+        lines.push('<span class="instruction disassembly-cell">' + du.instStr + '</span>');
+        lines.push('<input type="text" style="font-size:8px; height;14px;"></input>');
+
+        stringBuilder.push.apply(stringBuilder, lines);
+
+        if (i%10 == 0) {
+            var lk = $(stringBuilder.join(""));
+            return [
+                i + ' ; =============== F U N C T I O N ====================================',
+                '',
+                stringBuilder.join("")
+            ];
+        } else {
+            return [stringBuilder.join("")];
+        }
+    }
+
     require(["ace/ace", "ace/document"], function (ace, document) {
 
         var WindowLoader = function() {
@@ -52,16 +83,25 @@
                 var additionalLines = 0;
                 for (var i=duNum; i<duNum + this.windowSize; i++) {
 
-                    //var line = '<div style="height:14px" class="ace_line"><span class="branchLines"> &nbsp;</span><span class="offset disassembly-cell">.interp:4194872</span><span class="raw disassembly-cell">2f</span><span class="instruction"><span class="string">/</span></span></div>'
-                    var s = {"section_name":".text","offset":4233570,"rawBytes":"4889c7" + "_ row:" + i,"instStr":"mov    rdi,rax","branch":"&#x2001;&#x2001;&nbsp;","branch_label":"&#x2001;&#x2001;&nbsp;","opcode":"mov","operands":"rdi,rax","stringRef":null,"branchRef":null,"targetRef":null,"crossRef":[],"isBranch":false,"isFunction":false,"labelName":"abc"}
-                    tlines.push(JSON.stringify(s));
+                    //var line = '<div style="height:14px" class="ace_line"><span class="branchLines">&nbsp;</span><span class="offset disassembly-cell">.interp:4194872</span><span class="raw disassembly-cell">2f</span><span class="instruction"><span class="string">/</span></span></div>'
+                    var s = {"section_name":".text","offset":4233570,"rawBytes":"ff25d2ea2000","instStr":"mov    rdi,rax","branch":"&#x2001;&#x2001;&nbsp;","branch_label":"&#x2001;&#x2001;&nbsp;","opcode":"mov","operands":"rdi,rax","stringRef":null,"branchRef":null,"targetRef":null,"crossRef":[],"isBranch":false,"isFunction":false,"labelName":"abc"}
 
-                    if (i%10 == 0) {
-                        var s2 = {"section_name":".text","offset":4233570,"rawBytes":"4889c7" + "_ row2:" + i,"instStr":"mov    rdi,rax","branch":"&#x2001;&#x2001;&nbsp;","branch_label":"&#x2001;&#x2001;&nbsp;","opcode":"mov","operands":"rdi,rax","stringRef":null,"branchRef":null,"targetRef":null,"crossRef":[],"isBranch":false,"isFunction":false,"labelName":"abc"}
-                        tlines.push(JSON.stringify(s2));
-                        this.lineSizes[i] = 2;
-                        additionalLines += 1;
+                    var lines = renderer(s, i);
+                    if (lines.length != 1 && !this.lineSizes[i]) {
+                        this.lineSizes[i] = lines.length;
+                        additionalLines += lines.length - 1;
                     }
+                    for(var j=0; j<lines.length; j++) {
+                        tlines.push(lines[j]);
+                    }
+
+
+                    /*if (i%10 == 0) {
+                        var s2 = {"section_name":".text","offset":4233570,"rawBytes":"4889c7" + "_ row2:" + i,"instStr":"mov    rdi,rax","branch":"&#x2001;&#x2001;&nbsp;","branch_label":"&#x2001;&#x2001;&nbsp;","opcode":"mov","operands":"rdi,rax","stringRef":null,"branchRef":null,"targetRef":null,"crossRef":[],"isBranch":false,"isFunction":false,"labelName":"abc"}
+                        tlines.push(renderer(s));
+
+
+                    }*/
                 }
                 callback(new document.Window(rowNum, tlines), additionalLines);
             };
@@ -114,26 +154,8 @@
                             ), "px'>"
             );
 
-            if (line == "..") {
-                stringBuilder.push(line);
-            } else {
-                try {
-                    var du = JSON.parse(line);
-                    var lines = [];
-                    lines.push('<span class="branchLines">');
-                    lines.push(du.branch);
-                    lines.push('</span>');
-                    lines.push('<span class="offset disassembly-cell">');
-                    lines.push(du.section_name + ":" + du.offset);
-                    lines.push('</span> ');
-                    lines.push('<span class="raw disassembly-cell">' + du.rawBytes + '</span>');
+            stringBuilder.push(line);
 
-                    stringBuilder.push.apply(stringBuilder, lines);
-
-                } catch (e) {
-                    console.error("Parsing error:", e);
-                }
-            }
 
             stringBuilder.push("</div>");
 
