@@ -53,6 +53,7 @@ require(["ace/ace", "ace/ext/statusbar"], function(ace) {
     var statusBar = new StatusBar(editor, document.getElementById("statusBar"));
     editor.setTheme("ace/theme/dawn");
     editor.session.setMode("ace/mode/html");
+    window.editor = editor;
 });
 </script>
 
