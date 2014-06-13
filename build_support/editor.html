@@ -55,7 +55,8 @@
         lines.push('</span>');
         lines.push('<span class="raw disassembly-cell">' + du.rawBytes + '&nbsp;&nbsp;&nbsp;&nbsp;</span>');
         lines.push('<span class="instruction disassembly-cell">' + du.instStr + '</span>');
-        lines.push('<input type="text" style="font-size:8px; height;14px;"></input>');
+        lines.push('<span class="function-xref disassembly-cell"><a href="">0x2233453</a></span>')
+        //lines.push('<input type="text" style="font-size:8px; height;14px;"></input>');
 
         stringBuilder.push.apply(stringBuilder, lines);
 
@@ -71,7 +72,22 @@
         }
     }
 
-    require(["ace/ace", "ace/document"], function (ace, document) {
+    var OdaMode = function() {
+        this.getTokenizer = function() {
+            return {
+                getLineTokens : function(line, state, row) {
+                    return {
+                        state:'start',
+                        tokens:$.map($(line), function(el) {
+                            return {value: $(el).text(), type: $(el).attr('class')} ;
+                        })
+                    };
+                }
+            };
+        }
+    };
+
+    require(["ace/ace", "ace/document"], function (ace, ace_document) {
 
         var WindowLoader = function() {
             this.windowSize = 1000;
@@ -103,7 +119,7 @@
 
                     }*/
                 }
-                callback(new document.Window(rowNum, tlines), additionalLines);
+                callback(new ace_document.Window(rowNum, tlines), additionalLines);
             };
 
             this.rowToDisplayUnit = function(row) {
@@ -161,7 +177,7 @@
 
         };
 
-        var doc = new document.OnlineDocument(5000000, new WindowLoader());
+        var doc = new ace_document.OnlineDocument(5000000, new WindowLoader());
         doc.setLoadingString("..");
         var editor = ace.edit("editor", doc);
         editor.setTheme("ace/theme/chrome");
@@ -169,9 +185,18 @@
         editor.getSession().setMode("ace/mode/javascript");
         editor.getSession().setUseWorker(false);
         editor.setShowPrintMargin(false);
+        editor.getSession().setMode(new OdaMode());
 
         editor.getSession().selection.on('changeCursor', function(e) {
             console.log("changeCursor", e, editor.selection.getCursor());
+        });
+
+        editor.addEventListener('dblclick', function(e, editor){
+            console.log("dblclick");
+            var cursor = editor.selection.getCursor();
+            e.preventDefault();
+            console.log(editor.getSession().getTokenAt(cursor.row,cursor.column));
+            return "null";
         });
 
         editor.setKeyboardHandler(function(data, hashId, key, keyCode, e) {
