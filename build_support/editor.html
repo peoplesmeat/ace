@@ -60,16 +60,26 @@
 
         stringBuilder.push.apply(stringBuilder, lines);
 
+        var results = null;
         if (i%10 == 0) {
             var lk = $(stringBuilder.join(""));
-            return [
+            results = [
                 i + ' ; =============== F U N C T I O N ====================================',
                 '',
                 stringBuilder.join("")
             ];
         } else {
-            return [stringBuilder.join("")];
+            results = [stringBuilder.join("")];
         }
+
+        var mapped = [];
+        for (var i=0; i<results.length; i++) {
+            mapped.push({
+                data: du,
+                row: results[i]
+            });
+        }
+        return mapped;
     }
 
     var OdaMode = function() {
