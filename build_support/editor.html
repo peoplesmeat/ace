@@ -97,11 +97,15 @@
         }
     };
 
-    require(["ace/ace", "ace/document"], function (ace, ace_document) {
+    require(["ace/ace", "ace/document", "ace/lib/oop", "ace/lib/event_emitter"], function (ace, ace_document, oop, event_emitter) {
+        var EventEmitter = event_emitter.EventEmitter;
 
         var WindowLoader = function() {
+            oop.implement(this, EventEmitter);
+
             this.windowSize = 1000;
             this.lineSizes = [];
+
             this.load = function(rowNum, callback) {
                 var duNum = this.rowToDisplayUnit(rowNum);
                 console.log("Loading...",rowNum, duNum);
@@ -129,7 +133,10 @@
 
                     }*/
                 }
-                callback(new ace_document.Window(rowNum, tlines), additionalLines);
+                var window = new ace_document.Window(rowNum, tlines);
+
+                this._signal("loaded", { window: window, additionalRows: additionalLines });
+                //callback(, additionalLines);
             };
 
             this.rowToDisplayUnit = function(row) {
