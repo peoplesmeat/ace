@@ -210,8 +210,9 @@
 
         editor.addEventListener('dblclick', function(e, editor){
             console.log("dblclick");
-            var cursor = editor.selection.getCursor();
-            e.preventDefault();
+            /*var cursor = editor.selection.getCursor();
+            e.preventDefault(); */
+            doc.setLength(10);
             console.log(editor.getSession().getTokenAt(cursor.row,cursor.column));
             return "null";
         });
